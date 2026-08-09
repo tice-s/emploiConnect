@@ -62,13 +62,25 @@ git remote add origin https://github.com/TON-COMPTE/emploiconnect.git
 git push -u origin main
 ```
 
-### 3. Créer le service sur Render
+### 3. Créer un compte Cloudinary (stockage permanent des photos/logos)
+
+Render a un **disque éphémère** : toute photo de profil ou logo uploadé est
+supprimé au prochain déploiement. Cloudinary stocke ces fichiers ailleurs,
+de façon permanente, gratuitement.
+
+1. Va sur [cloudinary.com](https://cloudinary.com) → "Sign up" (gratuit, pas
+   de carte bancaire, 25 Go inclus).
+2. Sur le dashboard, section **"API Environment variable"**, copie la valeur
+   du type `cloudinary://123456789012345:AbCdEfGhIjKlMnOpQrStUvWxYz@ton-cloud`.
+
+### 4. Créer le service sur Render
 
 1. Va sur [render.com](https://render.com), crée un compte (gratuit).
 2. "New +" → **Blueprint** → connecte ton dépôt GitHub → Render détecte
    automatiquement `render.yaml`.
 3. Render te demandera de renseigner les variables marquées `sync: false` :
    - `DATABASE_URL` : colle l'URL Neon copiée à l'étape 1.
+   - `CLOUDINARY_URL` : colle l'URL Cloudinary copiée à l'étape 3.
    - `OLLAMA_BASE_URL` : laisse vide si tu n'as pas encore de VPS Ollama
      (les fonctions IA afficheront un message d'erreur clair sans planter,
      comme prévu dans `ai_engine`).

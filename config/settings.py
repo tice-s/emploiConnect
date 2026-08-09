@@ -5,6 +5,7 @@ Architecture : Django + SQLite (choix produit), pensée pour évoluer
 vers PostgreSQL/Redis/Celery sans réécriture (settings pilotés par .env).
 """
 
+import os
 from pathlib import Path
 from decouple import Csv, config
 import dj_database_url
@@ -23,6 +24,15 @@ RENDER_EXTERNAL_HOSTNAME = config("RENDER_EXTERNAL_HOSTNAME", default="")
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+# --- Stockage des fichiers médias (photo de profil, logo, CV importés) ------
+# Render (comme la plupart des PaaS gratuits) a un disque éphémère : tout
+# fichier uploadé est perdu au prochain déploiement/redémarrage. Si
+# CLOUDINARY_URL est définie (voir DEPLOIEMENT.md), les médias sont stockés
+# de façon permanente sur Cloudinary (gratuit) au lieu du disque local.
+CLOUDINARY_URL = config("CLOUDINARY_URL", default="")
+if CLOUDINARY_URL:
+    os.environ.setdefault("CLOUDINARY_URL", CLOUDINARY_URL)
+
 # --- IA (moteur local Ollama — aucun compte ni clé API requis) ---------------
 # Ollama tourne en tâche de fond sur la machine (installé via winget) et expose
 # une API HTTP locale. Aucune donnée ne quitte la machine, aucun compte externe
@@ -40,6 +50,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     "widget_tweaks",
+    "cloudinary_storage",
+    "cloudinary",
     # Apps métier
     "accounts",
     "candidates",
@@ -117,7 +129,11 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # (pas besoin de Nginx/CDN séparé) avec compression + hachage des noms de
 # fichiers pour un cache navigateur infini et sûr.
 STORAGES = {
-    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"
+        if CLOUDINARY_URL
+        else "django.core.files.storage.FileSystemStorage"
+    },
     "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
 
