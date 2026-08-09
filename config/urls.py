@@ -15,5 +15,8 @@ urlpatterns = [
     path("entretien/", include("interview_prep.urls")),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Sert les fichiers uploadés (photo de profil, logo d'entreprise, CV importés)
+# aussi bien en local qu'en production. Sur un projet de cette taille, sans
+# CDN/S3 dédié, faire porter ça par Django (via WhiteNoise en amont pour le
+# reste) reste le choix le plus simple ; à revoir si le trafic média grossit.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
