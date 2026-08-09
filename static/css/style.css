@@ -283,4 +283,30 @@ body > footer {
 
 @media (max-width: 576px) {
     .hero h1 { font-size: 1.6rem; }
+
+    /* Sur petit écran, les dégradés de marque (navbar, hero, badges IA)
+       paraissent plus ternes qu'en desktop — on booste la saturation et
+       le contraste pour qu'ils restent aussi vifs que sur grand écran. */
+    .bg-brand, .hero, .ai-badge, .badge-instant {
+        filter: saturate(1.35) contrast(1.08);
+    }
+
+    /* Les badges neutres (type de contrat, télétravail) passent en
+       teintes de marque plutôt qu'en gris plat, pour éviter un rendu
+       délavé sur mobile. */
+    .badge.text-bg-secondary {
+        background-color: var(--brand-primary) !important;
+        color: #fff !important;
+    }
+    .badge.text-bg-light {
+        background-color: #e6f7ef !important;
+        color: var(--brand-accent-dark) !important;
+        border-color: transparent !important;
+    }
+
+    /* Score de matching : couleurs plus franches, plus lisibles au
+       premier coup d'œil sur un écran de téléphone. */
+    .match-high { background: #d7f5e6; color: #0a5c3d; }
+    .match-mid  { background: #ffedc2; color: #7a4b00; }
+    .match-low  { background: #fbd9d5; color: #8f1c11; }
 }
