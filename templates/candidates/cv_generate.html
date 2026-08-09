@@ -71,6 +71,16 @@
 /* --- Galerie de mises en page : vrai aperçu (mêmes données fictives, mise à
    l'échelle fixe car le CV a toujours la même largeur A4 de base) --- */
 .style-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1rem; }
+@media (max-width: 576px) {
+    /* Sur mobile, minmax(190px, 1fr) ne laisse tenir qu'une seule
+       colonne : chaque aperçu de CV (ratio A4) prend alors ~470px de
+       haut, x4 modèles = un défilement énorme rien que pour comparer.
+       On force 2 colonnes plus compactes pour tout voir d'un coup d'œil. */
+    .style-gallery { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .style-card-name { font-size: 0.78rem; }
+    .style-card-desc { display: none; }
+    .style-preview-label { padding: 0.4rem 0.5rem; }
+}
 .style-preview-card {
     position: relative; border: 2px solid #e3e8ef; border-radius: 12px; overflow: hidden;
     cursor: pointer; background: #fff;
