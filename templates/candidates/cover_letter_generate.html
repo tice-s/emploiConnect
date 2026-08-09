@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Générer une lettre de motivation — EmploiConnect{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card p-4">
+            <span class="ai-badge mb-3 d-inline-block"><i class="bi bi-stars"></i> Génération IA</span>
+            <h1 class="h5 mb-3">Générer ma lettre de motivation</h1>
+            {% if job %}<p class="text-muted">Pour l'offre : <strong>{{ job.title }}</strong> — {{ job.company.name }}</p>{% endif %}
+            <p class="small text-muted"><i class="bi bi-clock-history"></i> La rédaction par l'IA locale prend
+                généralement 20 à 40 secondes sur cet ordinateur — c'est normal, ne rechargez pas la page.</p>
+            <form method="post" data-ai-action novalidate>
+                {% csrf_token %}
+                {{ form.job_id }}
+                {% if not job %}
+                <div class="mb-3">
+                    <label class="form-label">{{ form.company_name.label }}</label>
+                    {{ form.company_name|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.position_title.label }}</label>
+                    {{ form.position_title|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.job_description.label }}</label>
+                    {{ form.job_description|add_class:"form-control" }}
+                </div>
+                {% endif %}
+                <button type="submit" class="btn btn-brand w-100 fw-semibold">Générer ma lettre</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

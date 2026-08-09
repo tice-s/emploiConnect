@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Mes lettres de motivation — EmploiConnect{% endblock %}
+{% block content %}
+<h1 class="h4 mb-4">Mes lettres de motivation</h1>
+{% for letter in letters %}
+<div class="card p-3 mb-2 d-flex flex-row justify-content-between align-items-center">
+    <div>
+        <strong>{{ letter.position_title|default:"Poste" }}</strong> — {{ letter.company_name }}
+        <p class="small text-muted mb-0">Générée le {{ letter.created_at|date:"d/m/Y H:i" }}</p>
+    </div>
+    <a href="{% url 'candidates:cover_letter_detail' letter.pk %}" class="btn btn-sm btn-outline-primary">Voir</a>
+</div>
+{% empty %}
+<p class="text-muted">Aucune lettre générée pour le moment. <a href="{% url 'candidates:cover_letter_generate' %}">En générer une</a></p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,16 @@
+Django>=6.0,<6.1
+python-decouple>=3.8
+requests>=2.31
+Pillow>=10.4
+django-widget-tweaks>=1.5
+pypdf>=4.3
+python-docx>=1.1
+
+# Production (PostgreSQL + serveur + statics) — voir DEPLOIEMENT.md
+dj-database-url>=2.2
+psycopg2-binary>=2.9
+gunicorn>=22.0
+whitenoise>=6.7
+
+# Moteur IA : Ollama (application locale, installée séparément via winget/
+# https://ollama.com — aucun paquet Python requis, l'app y accède en HTTP local).

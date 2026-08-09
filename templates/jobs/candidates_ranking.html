@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Candidats — {{ job.title }} — EmploiConnect{% endblock %}
+{% block content %}
+<h1 class="h3 mb-1">Classement des candidats</h1>
+<p class="text-muted mb-4">{{ job.title }} — {{ applications|length }} candidature(s)</p>
+
+{% for app in applications %}
+<div class="card p-3 mb-3 {% if app.fraud_flag %}border-warning{% endif %}">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+        <div>
+            <h5 class="mb-1">{{ forloop.counter }}. {{ app.candidate.user.get_full_name|default:app.candidate.user.email }}</h5>
+            <p class="text-muted small mb-1">
+                {{ app.candidate.city|default:"Ville non renseignée" }} ·
+                {{ app.candidate.get_education_level_display|default:"Niveau non renseigné" }} ·
+                Candidature du {{ app.applied_at|date:"d/m/Y" }}
+            </p>
+            {% if app.fraud_flag %}
+                <p class="small text-warning-emphasis mb-1">
+                    <i class="bi bi-exclamation-triangle-fill"></i> Vérification recommandée : {{ app.fraud_reason }}
+                </p>
+            {% endif %}
+        </div>
+        <span class="match-badge {% if app.match_score >= 80 %}match-high{% elif app.match_score >= 50 %}match-mid{% else %}match-low{% endif %}">
+            {{ app.match_score }}%
+        </span>
+    </div>
+
+    {% with explanation=app.match_explanation %}
+    {% if explanation.matched_skills %}
+    <div class="mt-2">
+        {% for s in explanation.matched_skills %}<span class="skill-chip chip-matched"><i class="bi bi-check"></i> {{ s }}</span>{% endfor %}
+        {% for s in explanation.missing_skills %}<span class="skill-chip chip-missing"><i class="bi bi-x"></i> {{ s }}</span>{% endfor %}
+    </div>
+    {% endif %}
+    {% if explanation.strengths %}
+    <p class="small mt-2 mb-0"><strong>Pourquoi ce classement :</strong> {{ explanation.strengths|join:", " }}</p>
+    {% endif %}
+    {% endwith %}
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <form method="post" action="{% url 'applications:update_status' app.pk %}" class="d-flex gap-2">
+            {% csrf_token %}
+            <select name="status" class="form-select form-select-sm" style="width:auto;">
+                {% for value, label in app.Status.choices %}
+                <option value="{{ value }}" {% if app.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit" class="btn btn-sm btn-outline-primary">Mettre à jour</button>
+        </form>
+        <a href="{% url 'applications:detail' app.pk %}" class="btn btn-sm btn-brand">Voir le détail</a>
+    </div>
+</div>
+{% empty %}
+<p class="text-muted">Aucune candidature pour cette offre pour le moment.</p>
+{% endfor %}
+{% endblock %}

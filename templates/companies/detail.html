@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ company.name }} — EmploiConnect{% endblock %}
+{% block content %}
+<div class="card p-4 mb-4">
+    <div class="d-flex align-items-center gap-3">
+        {% if company.logo %}<img src="{{ company.logo.url }}" alt="" class="rounded" style="width:64px;height:64px;object-fit:cover;">{% endif %}
+        <div>
+            <h1 class="h3 mb-1">{{ company.name }} {% if company.is_verified %}<i class="bi bi-patch-check-fill text-primary" title="Entreprise vérifiée"></i>{% endif %}</h1>
+            <p class="text-muted mb-0">{{ company.sector }} · {{ company.city }} · {{ company.get_size_display }}</p>
+        </div>
+    </div>
+    {% if company.description %}<p class="mt-3">{{ company.description|linebreaks }}</p>{% endif %}
+    {% if company.website %}<a href="{{ company.website }}" target="_blank" rel="noopener">{{ company.website }}</a>{% endif %}
+</div>
+
+<h2 class="h4 mb-3">Offres publiées</h2>
+<div class="row g-3">
+    {% for job in job_offers %}
+    <div class="col-md-6">
+        <div class="card card-hover p-3">
+            <h5>{{ job.title }}</h5>
+            <p class="text-muted small mb-1">{{ job.get_contract_type_display }} · {{ job.location }}</p>
+            <a href="{% url 'jobs:detail' job.pk %}" class="stretched-link"></a>
+        </div>
+    </div>
+    {% empty %}
+    <p class="text-muted">Aucune offre publiée pour le moment.</p>
+    {% endfor %}
+</div>
+{% endblock %}

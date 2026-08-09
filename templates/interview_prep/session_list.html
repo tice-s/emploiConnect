@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Mes sessions d'entretien — EmploiConnect{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h4 mb-0">Mes sessions de préparation</h1>
+    <a href="{% url 'interview_prep:start' %}" class="btn btn-brand"><i class="bi bi-plus-lg"></i> Nouvelle session</a>
+</div>
+{% for session in sessions %}
+<div class="card p-3 mb-2 d-flex flex-row justify-content-between align-items-center">
+    <div>
+        <strong>{{ session.position_title }}</strong>{% if session.company_name %} — {{ session.company_name }}{% endif %}
+        <p class="small text-muted mb-0">{{ session.created_at|date:"d/m/Y H:i" }} — {% if session.is_completed %}Terminée{% else %}En cours{% endif %}</p>
+    </div>
+    <a href="{% url 'interview_prep:session_detail' session.pk %}" class="btn btn-sm btn-outline-primary">Ouvrir</a>
+</div>
+{% empty %}
+<p class="text-muted">Aucune session pour le moment.</p>
+{% endfor %}
+{% endblock %}

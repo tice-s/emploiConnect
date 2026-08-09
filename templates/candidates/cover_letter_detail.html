@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Lettre de motivation — EmploiConnect{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 no-print flex-wrap gap-2">
+    <h1 class="h5 mb-0">{{ position_title }} — {{ company_name }}</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'candidates:cover_letter_generate' %}{% if letter.job_id %}?job={{ letter.job_id }}{% endif %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-repeat"></i> Régénérer</a>
+        <button class="btn btn-outline-secondary btn-sm" onclick="window.print()"><i class="bi bi-printer"></i> Imprimer / PDF</button>
+    </div>
+</div>
+
+<div class="letter-page-wrapper">
+    <div class="letter-doc">
+        <div class="letter-accent"></div>
+
+        <div class="letter-sender">
+            <p class="letter-name">{{ full_name }}</p>
+            {% if city %}<p>{{ city }}</p>{% endif %}
+            {% if phone %}<p>{{ phone }}</p>{% endif %}
+            <p>{{ email }}</p>
+        </div>
+
+        <div class="letter-recipient">
+            <p>{{ company_name }}</p>
+            <p>À l'attention du service recrutement</p>
+        </div>
+
+        <p class="letter-date">{{ city|default:"Abidjan" }}, le {{ date_str }}</p>
+
+        <p class="letter-object"><strong>Objet :</strong> Candidature au poste de {{ position_title }}</p>
+
+        <p class="letter-greeting">Madame, Monsieur,</p>
+
+        <div class="letter-body">
+            {% for paragraph in body_paragraphs %}
+            <p>{{ paragraph }}</p>
+            {% endfor %}
+        </div>
+
+        <p class="letter-closing">
+            Je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
+        </p>
+
+        <p class="letter-signature">{{ full_name }}</p>
+    </div>
+</div>
+
+<style>
+/* ==========================================================================
+   Lettre — mise en page A4 (visible à l'écran, imprimable sans changement).
+   ========================================================================== */
+.letter-page-wrapper {
+    display: flex;
+    justify-content: center;
+    background: #e9edf1;
+    padding: 2rem 1rem;
+    border-radius: 0.75rem;
+}
+.letter-doc {
+    position: relative;
+    background: #fff;
+    width: 210mm;
+    max-width: 100%;
+    min-height: 297mm;
+    padding: 24mm 20mm;
+    box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.12);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 0.95rem;
+    line-height: 1.65;
+    color: #232323;
+    animation: fadeInUp 0.4s ease both;
+}
+.letter-accent {
+    position: absolute; top: 0; left: 0; right: 0; height: 6px;
+    background: linear-gradient(90deg, var(--brand-accent), var(--brand-primary));
+}
+.letter-sender { margin-bottom: 1.75rem; }
+.letter-sender p { margin: 0; }
+.letter-name { font-weight: 700; font-size: 1.05rem; }
+.letter-recipient { margin-bottom: 1.5rem; }
+.letter-recipient p { margin: 0; }
+.letter-date { text-align: right; margin-bottom: 1.5rem; }
+.letter-object { margin-bottom: 1.25rem; color: var(--brand-primary); }
+.letter-greeting { margin-bottom: 1rem; }
+.letter-body p { margin-bottom: 1rem; text-align: justify; }
+.letter-closing { margin-top: 1rem; }
+.letter-signature { margin-top: 2.5rem; font-weight: 700; text-align: right; }
+
+@media (max-width: 850px) {
+    .letter-page-wrapper { padding: 1rem 0.25rem; background: transparent; }
+    .letter-doc { min-height: 0; padding: 8mm 6mm; box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.1); }
+}
+
+@media print {
+    nav, footer, .no-print { display: none !important; }
+    body, .letter-page-wrapper { background: #fff !important; padding: 0 !important; }
+    .letter-doc { box-shadow: none; width: auto; min-height: 0; padding: 0; animation: none; }
+    @page { size: A4; margin: 20mm; }
+}
+</style>
+{% endblock %}

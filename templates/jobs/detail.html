@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }} — EmploiConnect{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card p-4 mb-4">
+            <h1 class="h3 mb-1">{{ job.title }}</h1>
+            <p class="text-muted mb-2">
+                <a href="{% url 'companies:detail' job.company.pk %}">{{ job.company.name }}</a>
+                — {{ job.location|default:"Lieu non précisé" }}
+            </p>
+            <div class="mb-3">
+                <span class="badge text-bg-secondary">{{ job.get_contract_type_display }}</span>
+                <span class="badge text-bg-light border">{{ job.get_remote_type_display }}</span>
+                {% if job.salary_min or job.salary_max %}
+                <span class="badge text-bg-light border">
+                    {% if job.salary_min %}{{ job.salary_min }}{% endif %}
+                    {% if job.salary_max %} - {{ job.salary_max }}{% endif %} FCFA/mois
+                </span>
+                {% endif %}
+            </div>
+            <h2 class="h5">Description du poste</h2>
+            <p>{{ job.description|linebreaks }}</p>
+            {% if job.responsibilities %}
+            <h2 class="h5">Missions</h2>
+            <p>{{ job.responsibilities|linebreaks }}</p>
+            {% endif %}
+            <h2 class="h5">Compétences recherchées</h2>
+            <div>
+                {% for js in job.required_skills.all %}
+                    <span class="skill-chip {% if js.is_mandatory %}fw-semibold{% endif %}">
+                        {{ js.skill.name }}{% if js.is_mandatory %} *{% endif %}
+                    </span>
+                {% empty %}
+                    <span class="text-muted">Non précisé</span>
+                {% endfor %}
+            </div>
+            <p class="small text-muted mt-1">* compétence obligatoire</p>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card p-4 mb-3">
+            {% if user.is_authenticated and user.is_candidate %}
+                {% if already_applied %}
+                    <div class="alert alert-success mb-2"><i class="bi bi-check-circle"></i> Vous avez déjà postulé.</div>
+                {% else %}
+                    {% if match_result %}
+                    <div class="mb-3">
+                        <span class="ai-badge mb-2 d-inline-block"><i class="bi bi-stars"></i> Analyse IA</span>
+                        <div>
+                            <span class="match-badge {% if match_result.score >= 80 %}match-high{% elif match_result.score >= 50 %}match-mid{% else %}match-low{% endif %}">
+                                Compatibilité : {{ match_result.score }}%
+                            </span>
+                        </div>
+                        {% if match_result.matched_skills %}
+                        <p class="small mt-2 mb-1 fw-semibold">Points forts :</p>
+                        {% for s in match_result.matched_skills %}<span class="skill-chip chip-matched"><i class="bi bi-check"></i> {{ s }}</span>{% endfor %}
+                        {% endif %}
+                        {% if match_result.missing_skills %}
+                        <p class="small mt-2 mb-1 fw-semibold">À développer :</p>
+                        {% for s in match_result.missing_skills %}<span class="skill-chip chip-missing"><i class="bi bi-x"></i> {{ s }}</span>{% endfor %}
+                        {% endif %}
+                        {% if match_result.advice %}<p class="small mt-2 fst-italic">💡 {{ match_result.advice }}</p>{% endif %}
+                    </div>
+                    {% else %}
+                    <form method="post" action="{% url 'jobs:compute_match' job.pk %}" data-ai-action class="mb-3">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-primary w-100">
+                            <i class="bi bi-stars"></i> Voir ma compatibilité (IA)
+                        </button>
+                    </form>
+                    {% endif %}
+
+                    <form method="post" action="{% url 'applications:apply' job.pk %}" data-ai-action>
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-brand w-100 fw-semibold">Postuler à cette offre</button>
+                    </form>
+                {% endif %}
+                <a href="{% url 'candidates:cover_letter_generate' %}?job={{ job.pk }}" class="btn btn-outline-secondary w-100 mt-2">
+                    <i class="bi bi-stars"></i> Générer ma lettre de motivation
+                </a>
+                <a href="{% url 'interview_prep:start' %}?job={{ job.pk }}" class="btn btn-outline-secondary w-100 mt-2">
+                    <i class="bi bi-stars"></i> Préparer mon entretien
+                </a>
+            {% elif not user.is_authenticated %}
+                <p>Connectez-vous en tant que candidat pour postuler et découvrir votre compatibilité.</p>
+                <a href="{% url 'accounts:login' %}" class="btn btn-brand w-100">Se connecter</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

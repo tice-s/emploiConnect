@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Mes offres — EmploiConnect{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Mes offres d'emploi</h1>
+    <a href="{% url 'jobs:create' %}" class="btn btn-brand"><i class="bi bi-plus-lg"></i> Nouvelle offre</a>
+</div>
+
+<div class="table-responsive">
+<table class="table table-hover bg-white align-middle">
+    <thead>
+        <tr><th>Poste</th><th>Statut</th><th>Contrat</th><th>Candidatures</th><th></th></tr>
+    </thead>
+    <tbody>
+        {% for job in jobs %}
+        <tr>
+            <td>{{ job.title }}</td>
+            <td><span class="badge text-bg-{% if job.status == 'published' %}success{% elif job.status == 'draft' %}secondary{% else %}dark{% endif %}">{{ job.get_status_display }}</span></td>
+            <td>{{ job.get_contract_type_display }}</td>
+            <td>{{ job.applications_count }}</td>
+            <td class="text-end">
+                <a href="{% url 'jobs:candidates' job.pk %}" class="btn btn-sm btn-outline-primary">Candidats</a>
+                <a href="{% url 'jobs:edit' job.pk %}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-muted text-center py-4">Aucune offre publiée pour le moment.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

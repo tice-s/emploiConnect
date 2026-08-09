@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Mes langues — EmploiConnect{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card p-4">
+            <h1 class="h5 mb-3">Mes langues</h1>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.languages|add_class:"form-control" }}
+                    <div class="form-text">{{ form.languages.help_text }}</div>
+                </div>
+                <button type="submit" class="btn btn-brand w-100">Enregistrer</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

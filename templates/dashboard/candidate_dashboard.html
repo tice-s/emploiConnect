@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Mon tableau de bord — EmploiConnect{% endblock %}
+{% block content %}
+<h1 class="h3 mb-4">Bonjour {{ profile.user.first_name|default:profile.user.email }} 👋</h1>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card p-3 text-center">
+            <h2 class="h3 mb-0">{{ applications_count }}</h2>
+            <p class="small text-muted mb-0">Candidatures</p>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card p-3 text-center">
+            <h2 class="h3 mb-0">{{ avg_match_score }}%</h2>
+            <p class="small text-muted mb-0">Compatibilité moyenne</p>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card p-3 text-center">
+            <h2 class="h3 mb-0">{{ profile.profile_completeness }}%</h2>
+            <p class="small text-muted mb-0">Profil complété</p>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card p-3 text-center">
+            <h2 class="h3 mb-0">{{ profile.generated_cvs.count }}</h2>
+            <p class="small text-muted mb-0">CV générés</p>
+        </div>
+    </div>
+</div>
+
+{% if profile.profile_completeness < 100 %}
+<div class="alert alert-info d-flex justify-content-between align-items-center">
+    <span>Votre profil est complété à {{ profile.profile_completeness }}%. Complétez-le pour de meilleures suggestions.</span>
+    <a href="{% url 'candidates:profile_edit' %}" class="btn btn-sm btn-brand">Compléter</a>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-lg-7">
+        <h2 class="h5 mb-3">Suggestions pour vous</h2>
+        {% for job, score in suggestions %}
+        <div class="card p-3 mb-2 card-hover">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <strong>{{ job.title }}</strong>
+                    <p class="small text-muted mb-0">{{ job.company.name }} — {{ job.location }}</p>
+                </div>
+                <span class="match-badge {% if score >= 80 %}match-high{% elif score >= 50 %}match-mid{% else %}match-low{% endif %}">{{ score }}%</span>
+            </div>
+            <a href="{% url 'jobs:detail' job.pk %}" class="stretched-link"></a>
+        </div>
+        {% empty %}
+        <p class="text-muted">Complétez vos compétences pour recevoir des suggestions personnalisées.</p>
+        {% endfor %}
+    </div>
+    <div class="col-lg-5">
+        <h2 class="h5 mb-3">Candidatures récentes</h2>
+        {% for app in recent_applications %}
+        <div class="card p-3 mb-2">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <strong>{{ app.job.title }}</strong>
+                    <p class="small text-muted mb-0">{{ app.job.company.name }}</p>
+                </div>
+                <span class="badge text-bg-light border align-self-start">{{ app.get_status_display }}</span>
+            </div>
+        </div>
+        {% empty %}<p class="text-muted">Aucune candidature récente.</p>{% endfor %}
+    </div>
+</div>
+{% endblock %}

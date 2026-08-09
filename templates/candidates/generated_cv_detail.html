@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Mon CV — EmploiConnect{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3 no-print flex-wrap gap-2">
+    <h1 class="h5 mb-0">CV — style {{ cv.get_style_display }}</h1>
+    <div class="d-flex gap-2">
+        <a href="{% url 'candidates:cv_generate' %}" class="btn btn-outline-secondary btn-sm"><i class="bi bi-palette"></i> Changer de style/couleur</a>
+        <button id="cvPrintBtn" class="btn btn-outline-secondary btn-sm"><i class="bi bi-printer"></i> Imprimer / PDF</button>
+    </div>
+</div>
+<p class="small text-muted no-print mb-2"><i class="bi bi-info-circle"></i> Le CV est automatiquement ajusté pour tenir sur une seule page A4, quelle que soit la longueur de votre contenu.</p>
+<div class="cv-doc-wrapper" id="cvFrame">
+    {{ cv.content_html|safe }}
+</div>
+<style>
+    .cv-doc-wrapper { background: #e9edf1; padding: 2rem 1rem; border-radius: 0.75rem; display: flex; justify-content: center; overflow: hidden; }
+    @media (max-width: 850px) { .cv-doc-wrapper { padding: 1rem 0.25rem; background: transparent; } }
+    @media print {
+        nav, footer, .no-print { display: none !important; }
+        .cv-doc-wrapper { background: #fff !important; padding: 0 !important; overflow: visible; height: auto !important; }
+    }
+</style>
+<script>
+// Ajuste automatiquement le CV pour qu'il tienne sur une seule page A4,
+// que le contenu du candidat soit court ou long (aucune coupure de texte,
+// aucune page blanche en trop).
+(function () {
+    var frame = document.getElementById("cvFrame");
+    var doc = frame.querySelector(".cv-doc");
+    if (!doc) return;
+
+    function pxPerMm() {
+        var ref = document.createElement("div");
+        ref.style.cssText = "height:100mm;width:1px;position:absolute;visibility:hidden;";
+        document.body.appendChild(ref);
+        var ratio = ref.offsetHeight / 100;
+        document.body.removeChild(ref);
+        return ratio || 3.78; // repli raisonnable (96dpi)
+    }
+
+    function fitToOnePage() {
+        doc.style.transform = "none";
+        var naturalHeight = doc.scrollHeight;
+        var pageHeightPx = 297 * pxPerMm();
+        var scale = Math.min(1, (pageHeightPx * 0.985) / naturalHeight);
+        if (scale < 1) {
+            doc.style.transform = "scale(" + scale + ")";
+            frame.style.height = (naturalHeight * scale) + "px";
+        } else {
+            frame.style.height = "auto";
+        }
+    }
+
+    fitToOnePage();
+    window.addEventListener("resize", fitToOnePage);
+    window.addEventListener("beforeprint", fitToOnePage);
+
+    document.getElementById("cvPrintBtn").addEventListener("click", function () {
+        fitToOnePage();
+        window.print();
+    });
+})();
+</script>
+{% endblock %}

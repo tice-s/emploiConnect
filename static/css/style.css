@@ -1,0 +1,286 @@
+/* EmploiConnect — feuille de style principale.
+   Orange = couleur principale, blanc = fond, vert = tertiaire (accents
+   ponctuels uniquement : succès, petits détails, jamais les boutons/nav
+   principaux). Animations et transitions visibles, désactivées auto si
+   l'utilisateur préfère moins de mouvement. */
+
+:root {
+    --brand-primary: #F7941D;       /* orange — couleur principale */
+    --brand-primary-dark: #D9790A;
+    --brand-accent: #1E7A4C;        /* vert — tertiaire, usage ponctuel */
+    --brand-accent-dark: #145C38;
+    --brand-bg-soft: #FFFFFF;       /* blanc */
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: var(--brand-bg-soft);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    /* Empêche tout élément trop large (mot long, tableau, badge) de
+       provoquer un défilement horizontal de la page entière sur mobile. */
+    overflow-x: hidden;
+}
+
+/* Filet de sécurité responsive : les images ne débordent jamais de leur
+   conteneur, quelle que soit la taille d'écran. */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Le footer reste toujours collé en bas, même quand le contenu de la
+   page est court (main prend tout l'espace disponible restant). */
+body > main {
+    flex: 1 0 auto;
+}
+body > footer {
+    flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Navigation — dégradé orange/vert animé, soulignement au survol, avatar.
+   ========================================================================== */
+.bg-brand {
+    background: linear-gradient(100deg, var(--brand-primary) 0%, var(--brand-primary-dark) 55%, var(--brand-accent) 160%) !important;
+    background-size: 200% 200%;
+    animation: navGradientShift 12s ease infinite;
+}
+@keyframes navGradientShift {
+    0%   { background-position: 0% 50%; }
+    50%  { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.navbar { animation: fadeInDown 0.45s ease both; }
+
+.navbar .nav-link {
+    position: relative;
+    transition: color 0.2s ease;
+}
+.navbar .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0.5rem; right: 0.5rem; bottom: 0.15rem;
+    height: 2px;
+    background: #fff;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+}
+.navbar .nav-link:hover::after,
+.navbar .nav-link.active::after {
+    transform: scaleX(1);
+}
+
+.user-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.22);
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.dropdown-menu {
+    animation: fadeInScale 0.18s ease both;
+    border: none;
+    border-radius: 0.75rem;
+}
+.dropdown-item {
+    border-radius: 0.5rem;
+    margin: 0.1rem 0.35rem;
+    width: calc(100% - 0.7rem);
+    transition: background 0.15s ease, padding-left 0.15s ease;
+}
+.dropdown-item:hover {
+    background: var(--brand-bg-soft);
+    padding-left: 1.1rem;
+}
+@keyframes fadeInScale {
+    from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+}
+
+/* ==========================================================================
+   Boutons — transitions franches (lever + ombre colorée) au survol.
+   ========================================================================== */
+.btn {
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+
+.btn-brand {
+    background-color: var(--brand-primary);
+    border-color: var(--brand-primary);
+    color: #fff;
+}
+.btn-brand:hover {
+    background-color: var(--brand-primary-dark);
+    border-color: var(--brand-primary-dark);
+    color: #fff;
+    box-shadow: 0 0.5rem 1rem rgba(247, 148, 29, 0.28);
+}
+
+.btn-accent {
+    background-color: var(--brand-accent);
+    border-color: var(--brand-accent);
+    color: #fff;
+}
+.btn-accent:hover {
+    background-color: var(--brand-accent-dark);
+    border-color: var(--brand-accent-dark);
+    color: #fff;
+    box-shadow: 0 0.5rem 1rem rgba(30, 122, 76, 0.28);
+}
+
+.btn-outline-primary:hover,
+.btn-outline-secondary:hover {
+    box-shadow: 0 0.4rem 0.9rem rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   Cartes — accent coloré et lever plus marqué au survol.
+   ========================================================================== */
+.card {
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 0.75rem;
+    transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+}
+.card.card-hover {
+    position: relative;
+    overflow: hidden;
+}
+.card.card-hover::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--brand-accent), var(--brand-primary));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+.card.card-hover:hover {
+    box-shadow: 0 0.9rem 1.75rem rgba(247, 148, 29, 0.16);
+    transform: translateY(-4px);
+    border-color: rgba(247, 148, 29, 0.2);
+}
+.card.card-hover:hover::before {
+    transform: scaleX(1);
+}
+
+/* ==========================================================================
+   Hero — dégradé animé plus vif.
+   ========================================================================== */
+.hero {
+    background: linear-gradient(120deg, var(--brand-primary) 0%, var(--brand-primary-dark) 45%, var(--brand-accent) 150%);
+    background-size: 200% 200%;
+    animation: navGradientShift 14s ease infinite;
+    color: #fff;
+    border-radius: 1rem;
+}
+
+.match-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.95rem;
+    transition: transform 0.15s ease;
+}
+.match-high { background: #e6f7ef; color: #0f7a52; animation: pulseGlow 2.4s ease-in-out infinite; }
+.match-mid { background: #fff6e0; color: #a06a00; }
+.match-low { background: #fdecea; color: #b3261e; }
+@keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(15, 122, 82, 0.25); }
+    50% { box-shadow: 0 0 0 6px rgba(15, 122, 82, 0); }
+}
+
+.skill-chip {
+    display: inline-block;
+    background: #eef2f7;
+    color: #33475b;
+    border-radius: 999px;
+    padding: 0.2rem 0.7rem;
+    font-size: 0.85rem;
+    margin: 0.15rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.skill-chip:hover {
+    transform: translateY(-2px) scale(1.04);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+.skill-chip.chip-missing {
+    background: #fdecea;
+    color: #b3261e;
+}
+.skill-chip.chip-matched {
+    background: #e6f7ef;
+    color: #0f7a52;
+}
+
+.progress-thin {
+    height: 0.5rem;
+}
+.progress-bar {
+    background-color: var(--brand-primary);
+    transition: width 0.6s ease;
+}
+
+.ai-badge, .badge-instant {
+    background: linear-gradient(90deg, var(--brand-accent), var(--brand-primary));
+    background-size: 200% 100%;
+    animation: navGradientShift 4s ease infinite;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   Transition d'entrée de page + apparition au défilement.
+   ========================================================================== */
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: none; }
+}
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+.page-enter {
+    animation: fadeInUp 0.35s ease both;
+}
+
+.reveal-on-scroll {
+    opacity: 0;
+}
+.reveal-on-scroll.is-visible {
+    animation: fadeInUp 0.5s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal-on-scroll { opacity: 1; }
+    *, .navbar, .hero, .bg-brand, .ai-badge, .badge-instant, .match-high {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero h1 { font-size: 1.6rem; }
+}

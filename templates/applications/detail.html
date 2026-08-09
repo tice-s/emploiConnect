@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Candidature — {{ application.job.title }} — EmploiConnect{% endblock %}
+{% block content %}
+<div class="card p-4">
+    <h1 class="h4 mb-1">{{ application.job.title }}</h1>
+    <p class="text-muted mb-3">{{ application.job.company.name }} — statut : <span class="badge text-bg-light border">{{ application.get_status_display }}</span></p>
+
+    <span class="match-badge {% if application.match_score >= 80 %}match-high{% elif application.match_score >= 50 %}match-mid{% else %}match-low{% endif %} mb-3">
+        Compatibilité : {{ application.match_score }}%
+    </span>
+
+    {% with e=application.match_explanation %}
+    {% if e.matched_skills %}
+        <p class="fw-semibold mb-1">Compétences en adéquation</p>
+        <div class="mb-2">{% for s in e.matched_skills %}<span class="skill-chip chip-matched">✅ {{ s }}</span>{% endfor %}</div>
+    {% endif %}
+    {% if e.missing_skills %}
+        <p class="fw-semibold mb-1">Compétences manquantes</p>
+        <div class="mb-2">{% for s in e.missing_skills %}<span class="skill-chip chip-missing">❌ {{ s }}</span>{% endfor %}</div>
+    {% endif %}
+    {% if e.advice %}<p class="fst-italic">💡 {{ e.advice }}</p>{% endif %}
+    {% endwith %}
+
+    {% if application.match_explanation.missing_skills %}
+    <a href="{% url 'jobs:detail' application.job.pk %}" class="btn btn-outline-secondary btn-sm mt-2">Retour à l'offre</a>
+    {% endif %}
+</div>
+{% endblock %}

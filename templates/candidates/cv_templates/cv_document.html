@@ -1,0 +1,278 @@
+{% load static %}
+<div class="cv-doc cv-style-{{ style }} {% if theme.dark %}cv-dark{% endif %}"
+     style="--cv-primary:{{ theme.primary }};--cv-secondary:{{ theme.secondary }};--cv-bg:{{ theme.bg }};--cv-surface:{{ theme.surface }};--cv-text:{{ theme.text }};">
+
+    <header class="cv-header">
+        {% if photo_url %}<img class="cv-photo" src="{{ photo_url }}" alt="{{ full_name }}">{% endif %}
+        <div class="cv-header-text">
+            <h1 class="cv-name">{{ full_name }}</h1>
+            {% if headline %}<p class="cv-headline">{{ headline }}</p>{% endif %}
+            <p class="cv-contact">
+                {% if city %}<span><i class="bi bi-geo-alt"></i> {{ city }}</span>{% endif %}
+                {% if phone %}<span><i class="bi bi-telephone"></i> {{ phone }}</span>{% endif %}
+                <span><i class="bi bi-envelope"></i> {{ email }}</span>
+            </p>
+        </div>
+    </header>
+
+    {% if bio %}
+    <section class="cv-section cv-bio">
+        <p>{{ bio }}</p>
+    </section>
+    {% endif %}
+
+    <div class="cv-columns">
+        <div class="cv-main">
+            {% if experiences %}
+            <section class="cv-section">
+                <h2 class="cv-section-title">Expérience</h2>
+                <ul class="cv-timeline">
+                    {% for exp in experiences %}
+                    <li class="cv-timeline-item">
+                        <span class="cv-dot"></span>
+                        <div class="cv-timeline-content">
+                            {% if exp.period %}<p class="cv-item-dates">{{ exp.period }}</p>{% endif %}
+                            <h3>{{ exp.title }}</h3>
+                            <p class="cv-item-sub">{{ exp.company }}</p>
+                            {% if exp.description %}<p class="cv-item-desc">{{ exp.description|linebreaksbr }}</p>{% endif %}
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
+
+            {% if educations %}
+            <section class="cv-section">
+                <h2 class="cv-section-title">Formation</h2>
+                <ul class="cv-timeline">
+                    {% for edu in educations %}
+                    <li class="cv-timeline-item">
+                        <span class="cv-dot"></span>
+                        <div class="cv-timeline-content">
+                            {% if edu.period %}<p class="cv-item-dates">{{ edu.period }}</p>{% endif %}
+                            <h3>{{ edu.degree }}</h3>
+                            <p class="cv-item-sub">{{ edu.institution }}{% if edu.field_of_study %} — {{ edu.field_of_study }}{% endif %}</p>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
+        </div>
+
+        <aside class="cv-sidebar">
+            {% if skills %}
+            <section class="cv-section">
+                <h2 class="cv-section-title">Compétences</h2>
+                <div class="cv-chips cv-skills">
+                    {% for s in skills %}<span class="cv-chip" style="--lvl:{{ s.level_pct }}%">{{ s.name }}</span>{% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            {% if languages %}
+            <section class="cv-section">
+                <h2 class="cv-section-title">Langues</h2>
+                <div class="cv-chips">
+                    {% for l in languages %}<span class="cv-chip">{{ l.name }} · {{ l.level }}</span>{% endfor %}
+                </div>
+            </section>
+            {% endif %}
+        </aside>
+    </div>
+</div>
+
+<style>
+/* ==========================================================================
+   CV — styles scopés sous .cv-doc (aucune fuite sur le reste du site).
+   Couleurs pilotées par variables CSS (--cv-*) injectées par le thème choisi.
+   ========================================================================== */
+.cv-doc {
+    --cv-radius: 14px;
+    background: var(--cv-bg);
+    color: var(--cv-text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    border-radius: var(--cv-radius);
+    overflow: hidden;
+    box-shadow: 0 0.5rem 2rem rgba(0,0,0,0.06);
+    width: 210mm;
+    max-width: 100%;
+    min-height: 297mm;
+    margin: 0 auto;
+}
+.cv-doc * { box-sizing: border-box; }
+
+@media print {
+    /* Pas de min-height ici : la mise à l'échelle automatique (voir
+       generated_cv_detail.html) garantit une seule page quelle que soit la
+       quantité de contenu, sans page blanche en trop si le CV est court. */
+    .cv-doc { width: 210mm; margin: 0; box-shadow: none; border-radius: 0; transform-origin: top left; }
+    @page { size: A4; margin: 8mm; }
+}
+
+/* --- En-tête ------------------------------------------------------------ */
+.cv-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: linear-gradient(120deg, var(--cv-primary), var(--cv-secondary));
+    color: #fff;
+    animation: cvFadeInDown .5s ease both;
+}
+.cv-photo {
+    width: 96px; height: 96px; border-radius: 50%;
+    object-fit: cover; border: 3px solid rgba(255,255,255,0.8);
+    flex-shrink: 0;
+}
+.cv-name { font-size: 1.7rem; font-weight: 800; margin: 0; letter-spacing: 0.02em; }
+.cv-headline { margin: 0.2rem 0 0.5rem; font-weight: 500; opacity: 0.95; }
+.cv-contact { margin: 0; font-size: 0.9rem; opacity: 0.9; display: flex; gap: 1rem; flex-wrap: wrap; }
+.cv-contact span { white-space: nowrap; }
+
+.cv-bio { padding: 1.25rem 2rem 0; font-style: italic; color: var(--cv-text); opacity: 0.9; }
+
+.cv-columns { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; padding: 1.5rem 2rem 2rem; }
+.cv-section { margin-bottom: 1.5rem; animation: cvFadeInUp .5s ease both; }
+.cv-section:nth-of-type(2) { animation-delay: .08s; }
+.cv-section:nth-of-type(3) { animation-delay: .16s; }
+.cv-section-title {
+    font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em;
+    font-weight: 700; color: var(--cv-primary); margin-bottom: 0.75rem;
+    padding-bottom: 0.35rem; border-bottom: 2px solid var(--cv-secondary);
+}
+
+/* --- Frise chronologique -------------------------------------------------- */
+.cv-timeline { list-style: none; margin: 0; padding: 0; border-left: 2px solid var(--cv-secondary); }
+.cv-timeline-item { position: relative; padding: 0 0 1.1rem 1.25rem; }
+.cv-timeline-item:last-child { padding-bottom: 0; }
+.cv-dot {
+    position: absolute; left: -6px; top: 4px; width: 10px; height: 10px;
+    border-radius: 50%; background: var(--cv-primary);
+    box-shadow: 0 0 0 3px var(--cv-bg);
+    transition: transform .2s ease;
+}
+.cv-timeline-item:hover .cv-dot { transform: scale(1.4); }
+.cv-item-dates { font-size: 0.78rem; font-weight: 700; color: var(--cv-secondary); margin: 0 0 0.15rem; }
+.cv-timeline-content h3 { font-size: 1rem; margin: 0; }
+.cv-item-sub { font-size: 0.88rem; opacity: 0.8; margin: 0.1rem 0 0.3rem; }
+.cv-item-desc { font-size: 0.88rem; margin: 0; opacity: 0.9; }
+
+/* --- Compétences / langues ------------------------------------------------ */
+.cv-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.cv-chip {
+    background: var(--cv-surface); border: 1px solid var(--cv-secondary);
+    color: var(--cv-text); border-radius: 999px; padding: 0.25rem 0.75rem;
+    font-size: 0.8rem; transition: transform .15s ease, box-shadow .15s ease;
+}
+.cv-chip:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+
+/* --- Animations ------------------------------------------------------------ */
+@keyframes cvFadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+@keyframes cvFadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* --- Variante : Minimaliste — pas de photo mise en avant, tout en une colonne, sobre --- */
+.cv-style-minimaliste .cv-header { background: none; color: var(--cv-text); border-bottom: 3px solid var(--cv-primary); }
+.cv-style-minimaliste .cv-contact,
+.cv-style-minimaliste .cv-headline { color: var(--cv-text); opacity: 0.75; }
+.cv-style-minimaliste .cv-columns { grid-template-columns: 1fr; }
+.cv-style-minimaliste .cv-name { font-weight: 300; letter-spacing: 0.04em; }
+.cv-style-minimaliste .cv-photo { display: none; }
+
+/* --- Variante : Professionnel — colonne compétences en encart sobre --- */
+.cv-style-professionnel .cv-header { background: var(--cv-primary); }
+.cv-style-professionnel .cv-sidebar { background: var(--cv-surface); border-radius: 10px; padding: 1rem; align-self: start; }
+.cv-style-professionnel .cv-chip { border-radius: 6px; }
+
+/* --- Variante : Créatif — blocs colorés séparés en colonne latérale,
+   barres de compétence — inspiré des CV les plus lus (photo, blocs nets) --- */
+.cv-style-creatif { display: flex; flex-direction: column; }
+.cv-style-creatif .cv-columns { grid-template-columns: 1fr 1.6fr; align-items: start; gap: 1.25rem; }
+.cv-style-creatif .cv-sidebar {
+    order: -1; display: flex; flex-direction: column; gap: 0.9rem; align-self: start;
+}
+.cv-style-creatif .cv-sidebar .cv-section {
+    background: var(--cv-primary); color: #fff; border-radius: 10px;
+    padding: 1rem 1.1rem; margin-bottom: 0;
+}
+.cv-style-creatif .cv-sidebar .cv-section-title { color: #fff; border-bottom-color: rgba(255,255,255,0.4); }
+.cv-style-creatif .cv-sidebar .cv-chip { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.4); }
+.cv-style-creatif .cv-header { background: linear-gradient(200deg, var(--cv-secondary), var(--cv-primary)); border-radius: 0 0 40% 4px / 0 0 24px 4px; }
+.cv-style-creatif .cv-name { font-size: 2rem; }
+.cv-style-creatif .cv-photo { border: 3px solid #fff; }
+/* Barres de niveau pour les compétences (au lieu de puces) */
+.cv-style-creatif .cv-skills { display: flex; flex-direction: column; gap: 0.5rem; }
+.cv-style-creatif .cv-skills .cv-chip {
+    display: block; position: relative; z-index: 0; background: rgba(255,255,255,0.2);
+    border: none; color: #fff; border-radius: 4px; padding: 0.3rem 0.6rem;
+    font-size: 0.78rem; overflow: hidden; margin: 0;
+}
+.cv-style-creatif .cv-skills .cv-chip::before {
+    content: ""; position: absolute; inset: 0; width: var(--lvl, 50%);
+    background: rgba(255,255,255,0.35); z-index: -1;
+}
+
+/* --- Thème sombre : ajuster les surfaces --- */
+.cv-dark .cv-chip { background: rgba(255,255,255,0.06); color: var(--cv-text); }
+.cv-dark .cv-item-sub, .cv-dark .cv-item-desc { opacity: 0.75; }
+
+/* --- Variante : Élégant — typographie serif, en-tête centré, fines règles dorées --- */
+.cv-style-elegant .cv-header {
+    background: var(--cv-bg); color: var(--cv-text);
+    flex-direction: column; text-align: center; border-bottom: 1px solid var(--cv-secondary);
+    padding: 2.5rem 2rem 1.5rem;
+}
+.cv-style-elegant .cv-name { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: 2rem; }
+.cv-style-elegant .cv-headline { color: var(--cv-secondary); font-style: italic; }
+.cv-style-elegant .cv-contact { justify-content: center; color: var(--cv-text); opacity: 0.7; }
+.cv-style-elegant .cv-section-title { font-family: Georgia, serif; font-weight: 400; border-bottom: 1px solid var(--cv-secondary); letter-spacing: 0.2em; }
+.cv-style-elegant .cv-timeline { border-left-color: var(--cv-secondary); }
+.cv-style-elegant .cv-photo { border-radius: 50%; margin: 0 auto; }
+
+/* --- Variante : Compact — deux colonnes serrées, texte plus petit --- */
+.cv-style-compact .cv-header { padding: 1.25rem 1.5rem; gap: 1rem; }
+.cv-style-compact .cv-photo { width: 64px; height: 64px; }
+.cv-style-compact .cv-name { font-size: 1.3rem; }
+.cv-style-compact .cv-columns { padding: 1rem 1.5rem 1.5rem; gap: 1rem; }
+.cv-style-compact .cv-section { margin-bottom: 0.9rem; }
+.cv-style-compact .cv-timeline-item { padding-bottom: 0.6rem; }
+.cv-style-compact .cv-item-desc, .cv-style-compact .cv-item-sub { font-size: 0.8rem; }
+
+/* --- Variante : Blocs de couleur — titres de section en bandeaux pleins --- */
+.cv-style-bloc_couleur .cv-columns { grid-template-columns: 1fr 1.4fr; }
+.cv-style-bloc_couleur .cv-sidebar { order: -1; }
+.cv-style-bloc_couleur .cv-section-title {
+    background: var(--cv-primary); color: #fff; border: none;
+    padding: 0.4rem 0.8rem; border-radius: 6px; letter-spacing: 0.06em;
+}
+.cv-style-bloc_couleur .cv-sidebar .cv-section-title { background: var(--cv-secondary); }
+.cv-style-bloc_couleur .cv-header { background: var(--cv-surface); color: var(--cv-text); }
+.cv-style-bloc_couleur .cv-headline { color: var(--cv-primary); font-weight: 700; }
+.cv-style-bloc_couleur .cv-contact { color: var(--cv-text); opacity: 0.75; }
+
+/* --- Variante : Classique (ATS) — une colonne, très peu de couleur, texte lisible --- */
+.cv-style-classique .cv-header { background: var(--cv-bg); color: var(--cv-text); border-bottom: 2px solid var(--cv-text); flex-direction: column; text-align: center; }
+.cv-style-classique .cv-headline, .cv-style-classique .cv-contact { color: var(--cv-text); opacity: 0.8; }
+.cv-style-classique .cv-photo { display: none; }
+.cv-style-classique .cv-columns { grid-template-columns: 1fr; }
+.cv-style-classique .cv-section-title { color: var(--cv-text); border-bottom-color: var(--cv-text); }
+.cv-style-classique .cv-timeline { border-left-color: #ccc; }
+.cv-style-classique .cv-dot { background: var(--cv-text); }
+.cv-style-classique .cv-chip { border-color: #ccc; background: none; }
+
+/* --- Responsive (mobile-first) --- */
+@media (max-width: 576px) {
+    .cv-header { flex-direction: column; text-align: center; padding: 1.5rem; }
+    .cv-contact { justify-content: center; }
+    .cv-columns { grid-template-columns: 1fr; padding: 1.25rem; }
+    .cv-style-creatif .cv-sidebar,
+    .cv-style-bloc_couleur .cv-sidebar { order: 0; }
+}
+
+/* --- Impression : pas d'animation, pas d'ombre --- */
+@media print {
+    .cv-doc, .cv-doc * { animation: none !important; box-shadow: none !important; }
+    .cv-doc { border-radius: 0; }
+}
+</style>

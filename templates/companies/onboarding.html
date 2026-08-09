@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Votre entreprise — EmploiConnect{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card p-4">
+            <h1 class="h3 mb-2">Créer ou rejoindre votre entreprise</h1>
+            <p class="text-muted">Si votre entreprise existe déjà sur la plateforme, saisissez son nom exact pour la
+                rejoindre automatiquement. Sinon, remplissez le formulaire pour la créer.</p>
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field|add_class:"form-control" }}
+                    {% if field.errors %}<div class="text-danger small">{{ field.errors }}</div>{% endif %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-brand w-100 fw-semibold">Valider</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

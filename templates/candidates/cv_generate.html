@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load cv_extras %}
+{% block title %}Générer mon CV — EmploiConnect{% endblock %}
+{% block content %}
+<span class="badge-instant mb-2 d-inline-block"><i class="bi bi-lightning-charge-fill"></i> Génération instantanée</span>
+<h1 class="h5 mb-3">Créer mon CV</h1>
+
+<form method="post" novalidate>
+    {% csrf_token %}
+
+    <p class="form-label fw-semibold mb-2">Choisissez une mise en page <span class="text-muted fw-normal">(aperçu réel, {{ form.style.field.choices|length }} modèles)</span></p>
+    <div class="style-gallery mb-4">
+        {% for radio in form.style %}
+        {% with meta=styles_meta|dict_get:radio.data.value preview=style_previews|dict_get:radio.data.value %}
+        <label class="style-preview-card">
+            {{ radio.tag }}
+            <div class="style-preview-frame"><div class="cv-scale-inner">{{ preview|safe }}</div></div>
+            <div class="style-preview-label">
+                <span class="style-card-name">{{ radio.choice_label }}</span>
+                <span class="style-card-desc">{{ meta.description }}</span>
+            </div>
+        </label>
+        {% endwith %}
+        {% endfor %}
+    </div>
+
+    <div class="card p-4">
+        <p class="form-label fw-semibold mb-2">Palette de couleurs <span class="text-muted fw-normal">({{ form.theme.field.choices|length }} palettes)</span></p>
+        <div class="theme-picker mb-4">
+            {% for radio in form.theme %}
+            {% with meta=themes_meta|dict_get:radio.data.value %}
+            <label class="theme-swatch">
+                {{ radio.tag }}
+                <span class="swatch-dot" style="background: linear-gradient(135deg, {{ meta.primary }} 50%, {{ meta.secondary }} 50%);"></span>
+                <span class="swatch-name">{{ radio.choice_label }}</span>
+            </label>
+            {% endwith %}
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-brand w-100 fw-semibold">
+            <i class="bi bi-magic"></i> Générer mon CV
+        </button>
+    </div>
+</form>
+
+{% if cvs %}
+<h2 class="h5 mt-4 mb-3">Mes CV générés</h2>
+{% for cv in cvs %}
+{% with meta=themes_meta|dict_get:cv.theme %}
+<div class="card p-3 mb-2 d-flex flex-row justify-content-between align-items-center card-hover">
+    <div class="d-flex align-items-center gap-2">
+        <span class="theme-dot" style="background: linear-gradient(135deg, {{ meta.primary }} 50%, {{ meta.secondary }} 50%);"></span>
+        <div>
+            <strong>{{ cv.get_style_display }}</strong>
+            <p class="small text-muted mb-0">{{ cv.get_theme_display }} · {{ cv.created_at|date:"d/m/Y H:i" }}</p>
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'candidates:generated_cv_detail' cv.pk %}" class="btn btn-sm btn-outline-primary">Voir</a>
+        <form method="post" action="{% url 'candidates:generated_cv_delete' cv.pk %}" onsubmit="return confirm('Supprimer ce CV ?');">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+        </form>
+    </div>
+</div>
+{% endwith %}
+{% endfor %}
+{% endif %}
+
+<style>
+/* --- Galerie de mises en page : vrai aperçu (mêmes données fictives, mise à
+   l'échelle fixe car le CV a toujours la même largeur A4 de base) --- */
+.style-gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1rem; }
+.style-preview-card {
+    position: relative; border: 2px solid #e3e8ef; border-radius: 12px; overflow: hidden;
+    cursor: pointer; background: #fff;
+    transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.style-preview-card:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(0,0,0,0.1); }
+.style-preview-card input { position: absolute; opacity: 0; }
+.style-preview-frame { position: relative; width: 100%; aspect-ratio: 210 / 297; overflow: hidden; background: #f3f3f3; pointer-events: none; }
+.cv-scale-inner { position: absolute; top: 0; left: 0; width: 210mm; transform-origin: top left; transform: scale(0.252); }
+.style-preview-label { padding: 0.5rem 0.65rem; border-top: 1px solid #eee; }
+.style-card-name { display: block; font-weight: 700; font-size: 0.85rem; }
+.style-card-desc { display: block; font-size: 0.7rem; color: #6c757d; line-height: 1.25; margin-top: 0.15rem; }
+.style-preview-card:has(input:checked),
+.style-preview-card.is-selected { border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(247, 148, 29, 0.18); }
+.style-preview-card:has(input:checked) .style-card-name,
+.style-preview-card.is-selected .style-card-name { color: var(--brand-primary); }
+
+.theme-picker { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.theme-swatch {
+    position: relative; display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.4rem 0.8rem 0.4rem 0.4rem; border: 2px solid #e3e8ef; border-radius: 999px;
+    cursor: pointer; font-size: 0.85rem; transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.theme-swatch:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+.theme-swatch input { position: absolute; opacity: 0; }
+.theme-swatch:has(input:checked),
+.theme-swatch.is-selected { border-color: #333; }
+.swatch-dot, .theme-dot { width: 20px; height: 20px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+.theme-dot { width: 14px; height: 14px; }
+</style>
+{% endblock %}

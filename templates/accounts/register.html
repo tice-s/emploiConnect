@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Créer un compte — EmploiConnect{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card p-4">
+            <h1 class="h3 mb-4">Créer votre compte</h1>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Je suis un(e)</label>
+                    <div class="d-flex gap-3">
+                        {% for radio in form.role %}
+                            <div class="form-check">
+                                {{ radio.tag }}
+                                <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if form.role.errors %}<div class="text-danger small">{{ form.role.errors }}</div>{% endif %}
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Prénom</label>
+                        {{ form.first_name|add_class:"form-control" }}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nom</label>
+                        {{ form.last_name|add_class:"form-control" }}
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Adresse e-mail</label>
+                    {{ form.email|add_class:"form-control" }}
+                    {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors }}</div>{% endif %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Téléphone (optionnel)</label>
+                    {{ form.phone|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Mot de passe</label>
+                    {{ form.password1|add_class:"form-control" }}
+                    <div class="form-text">{{ form.password1.help_text|safe }}</div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Confirmer le mot de passe</label>
+                    {{ form.password2|add_class:"form-control" }}
+                </div>
+                {% if form.non_field_errors %}<div class="alert alert-danger">{{ form.non_field_errors }}</div>{% endif %}
+                <button type="submit" class="btn btn-brand w-100 fw-semibold">Créer mon compte</button>
+            </form>
+            <p class="text-center mt-3 mb-0">Déjà inscrit ? <a href="{% url 'accounts:login' %}">Connectez-vous</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

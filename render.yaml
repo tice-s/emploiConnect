@@ -1,0 +1,30 @@
+# Blueprint Render — permet un déploiement en un clic via "New +" → "Blueprint"
+# en pointant sur ce dépôt GitHub. Documentation : https://render.com/docs/blueprint-spec
+#
+# La base de données PostgreSQL N'EST PAS définie ici : le projet utilise
+# Neon (gratuit, permanent — voir DEPLOIEMENT.md) plutôt que le Postgres géré
+# par Render (gratuit mais supprimé après 30 jours). Colle l'URL de connexion
+# Neon dans la variable DATABASE_URL ci-dessous, directement dans le
+# dashboard Render après la création du service (elle est marquée "sync:
+# false" pour ne jamais être commitée dans ce fichier).
+
+services:
+  - type: web
+    name: emploiconnect
+    runtime: python
+    plan: free
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn config.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.10
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: DATABASE_URL
+        sync: false
+      - key: OLLAMA_BASE_URL
+        sync: false
+      - key: OLLAMA_MODEL
+        value: llama3.2:3b

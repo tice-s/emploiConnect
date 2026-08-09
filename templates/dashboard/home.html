@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="hero p-4 p-md-5 mb-5">
+    <div class="row align-items-center">
+        <div class="col-lg-8">
+            <span class="ai-badge mb-3 d-inline-block"><i class="bi bi-stars"></i> Assistant IA de carrière</span>
+            <h1 class="fw-bold mb-3">Trouvez le bon poste, préparez-vous, réussissez.</h1>
+            <p class="lead mb-4">EmploiConnect ne se contente pas de lister des offres : notre IA analyse votre CV,
+                calcule votre compatibilité avec chaque poste, rédige vos lettres de motivation et vous entraîne
+                à l'entretien — jusqu'à ce que vous soyez prêt.</p>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg fw-semibold">Créer mon profil</a>
+                <a href="{% url 'jobs:list' %}" class="btn btn-outline-light btn-lg">Voir les offres</a>
+            </div>
+        </div>
+        <div class="col-lg-4 text-center mt-4 mt-lg-0">
+            <div class="bg-white bg-opacity-10 rounded-4 p-4">
+                <h2 class="display-6 fw-bold mb-0">{{ stats.jobs_count }}</h2>
+                <p class="mb-3">offres actives</p>
+                <h2 class="display-6 fw-bold mb-0">{{ stats.companies_count }}</h2>
+                <p class="mb-0">entreprises inscrites</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card h-100 p-3 card-hover">
+            <div class="card-body">
+                <i class="bi bi-file-earmark-text fs-2 text-primary"></i>
+                <h5 class="mt-2">CV automatique</h5>
+                <p class="text-muted small mb-0">Importez votre CV ou répondez à quelques questions : l'IA génère un
+                    CV moderne, prêt à envoyer, en plusieurs styles.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 p-3 card-hover">
+            <div class="card-body">
+                <i class="bi bi-graph-up-arrow fs-2 text-success"></i>
+                <h5 class="mt-2">Matching intelligent</h5>
+                <p class="text-muted small mb-0">Un score de compatibilité honnête pour chaque offre, avec le détail
+                    des compétences qui manquent et un plan pour progresser.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100 p-3 card-hover">
+            <div class="card-body">
+                <i class="bi bi-chat-dots fs-2 text-warning"></i>
+                <h5 class="mt-2">Préparation d'entretien</h5>
+                <p class="text-muted small mb-0">Des questions générées sur mesure pour le poste visé, avec une
+                    analyse de vos réponses et des conseils pour vous améliorer.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if latest_jobs %}
+<h2 class="h4 mb-3">Dernières offres publiées</h2>
+<div class="row g-3">
+    {% for job in latest_jobs %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 card-hover">
+            <div class="card-body">
+                <h5 class="card-title">{{ job.title }}</h5>
+                <p class="text-muted mb-1">{{ job.company.name }} — {{ job.location|default:"Lieu non précisé" }}</p>
+                <span class="badge text-bg-secondary">{{ job.get_contract_type_display }}</span>
+                <span class="badge text-bg-light border">{{ job.get_remote_type_display }}</span>
+                <a href="{% url 'jobs:detail' job.pk %}" class="stretched-link"></a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

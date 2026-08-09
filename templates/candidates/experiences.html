@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Mes expériences — EmploiConnect{% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-lg-5">
+        <div class="card p-4">
+            <h1 class="h5 mb-3">Ajouter une expérience</h1>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="mb-3">
+                    <label class="form-label">{{ field.label }}</label>
+                    {% if field.name == "is_current" %}
+                        <div class="form-check">{{ field }} <label class="form-check-label">{{ field.label }}</label></div>
+                    {% else %}
+                        {{ field|add_class:"form-control" }}
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-brand w-100">Ajouter</button>
+            </form>
+        </div>
+    </div>
+    <div class="col-lg-7">
+        <h2 class="h5 mb-3">Mes expériences</h2>
+        {% for exp in experiences %}
+        <div class="card p-3 mb-2 d-flex flex-row justify-content-between align-items-start">
+            <div>
+                <strong>{{ exp.title }}</strong> — {{ exp.company }}
+                <p class="small text-muted mb-0">{{ exp.start_date|date:"m/Y" }} - {% if exp.is_current %}Aujourd'hui{% else %}{{ exp.end_date|date:"m/Y" }}{% endif %}</p>
+                <p class="small mb-0">{{ exp.description }}</p>
+            </div>
+            <form method="post" action="{% url 'candidates:experience_delete' exp.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+            </form>
+        </div>
+        {% empty %}<p class="text-muted">Aucune expérience ajoutée.</p>{% endfor %}
+    </div>
+</div>
+{% endblock %}

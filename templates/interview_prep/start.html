@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Préparer un entretien — EmploiConnect{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card p-4">
+            <span class="ai-badge mb-3 d-inline-block"><i class="bi bi-stars"></i> Coach d'entretien IA</span>
+            <h1 class="h5 mb-2">Préparer mon entretien</h1>
+            <p class="text-muted">L'IA analyse votre profil et le poste visé pour générer des questions
+                d'entretien réalistes, puis évalue vos réponses.</p>
+            <form method="post" data-ai-action novalidate>
+                {% csrf_token %}
+                {{ form.job_id }}
+                <div class="mb-3">
+                    <label class="form-label">{{ form.position_title.label }}</label>
+                    {{ form.position_title|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.company_name.label }}</label>
+                    {{ form.company_name|add_class:"form-control" }}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">{{ form.job_description.label }}</label>
+                    {{ form.job_description|add_class:"form-control" }}
+                </div>
+                <button type="submit" class="btn btn-brand w-100 fw-semibold">Générer mes questions</button>
+            </form>
+        </div>
+        <p class="text-center mt-3"><a href="{% url 'interview_prep:session_list' %}">Voir mes sessions précédentes</a></p>
+    </div>
+</div>
+{% endblock %}

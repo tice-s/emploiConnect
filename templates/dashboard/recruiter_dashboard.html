@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord entreprise — EmploiConnect{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">{{ company.name }}</h1>
+    <a href="{% url 'jobs:create' %}" class="btn btn-brand"><i class="bi bi-plus-lg"></i> Publier une offre</a>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-4">
+        <div class="card p-3 text-center"><h2 class="h3 mb-0">{{ total_jobs }}</h2><p class="small text-muted mb-0">Offres au total</p></div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="card p-3 text-center"><h2 class="h3 mb-0">{{ published_jobs }}</h2><p class="small text-muted mb-0">Offres publiées</p></div>
+    </div>
+    <div class="col-6 col-md-4">
+        <div class="card p-3 text-center"><h2 class="h3 mb-0">{{ total_applications }}</h2><p class="small text-muted mb-0">Candidatures reçues</p></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <h2 class="h5 mb-3">Mes offres récentes</h2>
+        <div class="table-responsive">
+        <table class="table bg-white">
+            <thead><tr><th>Poste</th><th>Statut</th><th>Candidatures</th><th></th></tr></thead>
+            <tbody>
+                {% for job in jobs|slice:":8" %}
+                <tr>
+                    <td>{{ job.title }}</td>
+                    <td><span class="badge text-bg-{% if job.status == 'published' %}success{% else %}secondary{% endif %}">{{ job.get_status_display }}</span></td>
+                    <td>{{ job.n_applications }}</td>
+                    <td><a href="{% url 'jobs:candidates' job.pk %}" class="btn btn-sm btn-outline-primary">Candidats</a></td>
+                </tr>
+                {% empty %}<tr><td colspan="4" class="text-muted text-center py-3">Aucune offre publiée.</td></tr>{% endfor %}
+            </tbody>
+        </table>
+        </div>
+        <a href="{% url 'jobs:recruiter_list' %}">Voir toutes mes offres →</a>
+    </div>
+    <div class="col-lg-4">
+        <h2 class="h5 mb-3">Compétences les plus demandées</h2>
+        <div class="card p-3">
+            {% for s in top_skills %}
+                <div class="d-flex justify-content-between">
+                    <span>{{ s.required_skills__skill__name }}</span>
+                    <span class="text-muted">{{ s.n }}</span>
+                </div>
+            {% empty %}<p class="text-muted small mb-0">Ajoutez des compétences à vos offres pour voir cette statistique.</p>{% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
